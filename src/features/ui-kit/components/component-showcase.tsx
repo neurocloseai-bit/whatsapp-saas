@@ -99,10 +99,10 @@ import {
 // ============================================================
 const BRAND = {
   name: "Agente WhatsApp",
-  primaryHex: "#B5F23D", // oklch(0.90 0.21 126) — Electric Lime
-  accentHex: "#B5F23D",
+  primaryHex: "#7C3AED", // oklch(0.541 0.247 293) — Neuroclose Violet
+  accentHex: "#F472B6", // oklch(0.725 0.175 349.8) — Neuroclose Pink
   font: "Space Grotesk (display) · Geist Sans (body) · Geist Mono",
-  personality: "Glass + Electric — Apple/visionOS glassmorphism",
+  personality: "Glass + Neuroclose Violet — Apple/visionOS glassmorphism",
   audience: "B2B · operadores / setters / admins",
   radius: "14px",
 };

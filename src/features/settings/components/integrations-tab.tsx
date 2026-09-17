@@ -20,7 +20,7 @@ import { ModelPicker } from "@/features/agents/components/model-picker";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Provider = "ycloud" | "openrouter" | "highlevel";
+type Provider = "ycloud" | "openrouter" | "highlevel" | "google_calendar";
 
 type IntegrationData = {
   provider: Provider;
@@ -819,6 +819,260 @@ function HighLevelSection({
   );
 }
 
+// ─── Google Calendar section ──────────────────────────────────────────────────
+
+// Shape of the JSON key file downloaded from Google Cloud Console
+// (IAM & Admin → Service Accounts → Keys → Add key → JSON).
+interface ServiceAccountJson {
+  client_email?: string;
+  private_key?: string;
+}
+
+function GoogleCalendarSection({
+  workspaceId,
+  initial,
+  onSaved,
+}: {
+  workspaceId: string;
+  initial: IntegrationData | undefined;
+  onSaved: () => void;
+}) {
+  const [clientEmail, setClientEmail] = useState(
+    initial?.credentials?.google_client_email ?? "",
+  );
+  const [privateKey, setPrivateKey] = useState(
+    initial?.credentials?.google_private_key ?? "",
+  );
+  const [jsonPaste, setJsonPaste] = useState("");
+  const [calendarId, setCalendarId] = useState(
+    (initial?.config?.calendar_id as string | undefined) ?? "",
+  );
+  const [timezone, setTimezone] = useState(
+    (initial?.config?.timezone as string | undefined) ??
+      "America/Mexico_City",
+  );
+  const [startHour, setStartHour] = useState<number>(
+    (initial?.config?.business_start_hour as number | undefined) ?? 9,
+  );
+  const [endHour, setEndHour] = useState<number>(
+    (initial?.config?.business_end_hour as number | undefined) ?? 18,
+  );
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+
+  // Paste the whole downloaded JSON key file here and it auto-fills the two
+  // fields below — nobody has to hand-extract client_email/private_key.
+  function handleJsonPaste(value: string) {
+    setJsonPaste(value);
+    try {
+      const parsed = JSON.parse(value) as ServiceAccountJson;
+      if (parsed.client_email) setClientEmail(parsed.client_email);
+      if (parsed.private_key) setPrivateKey(parsed.private_key);
+      if (parsed.client_email || parsed.private_key) {
+        toast.success("Datos de la cuenta de servicio detectados");
+      }
+    } catch {
+      // Ignore — user may still be pasting, or pasted something else.
+    }
+  }
+
+  async function handleSave() {
+    if (!clientEmail || !privateKey) {
+      toast.error("Pega el JSON de la cuenta de servicio primero");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/workspace/${workspaceId}/integrations`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: "google_calendar",
+          enabled: true,
+          credentials: {
+            google_client_email: clientEmail,
+            google_private_key: privateKey,
+          },
+          config: {
+            calendar_id: calendarId || "primary",
+            timezone,
+            business_start_hour: startHour,
+            business_end_hour: endHour,
+          },
+        }),
+      });
+      const json = (await res.json()) as { ok?: boolean; error?: string };
+      if (json.ok) {
+        toast.success("Configuración de Google Calendar guardada");
+        setJsonPaste("");
+        onSaved();
+      } else {
+        toast.error(json.error ?? "Error al guardar");
+      }
+    } catch {
+      toast.error("Error de red al guardar");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleTest() {
+    setTesting(true);
+    try {
+      const res = await fetch(
+        `/api/workspace/${workspaceId}/integrations/google-calendar/test`,
+        { method: "POST" },
+      );
+      const json = (await res.json()) as {
+        ok: boolean;
+        error?: string;
+        calendarName?: string;
+      };
+      if (json.ok) {
+        toast.success(`Google Calendar conectado — ${json.calendarName}`);
+      } else {
+        toast.error(json.error ?? "Error al probar la conexión");
+      }
+    } catch {
+      toast.error("Error de red al probar la conexión");
+    } finally {
+      setTesting(false);
+    }
+  }
+
+  return (
+    <Section
+      title="Google Calendar"
+      description="Conecta un calendario de Google con una cuenta de servicio (sin necesidad de iniciar sesión con OAuth)."
+    >
+      <div className="grid gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="gcal-json">
+            JSON de la cuenta de servicio (pégalo completo)
+          </Label>
+          <Textarea
+            id="gcal-json"
+            placeholder='{"client_email": "...", "private_key": "..."}'
+            value={jsonPaste}
+            onChange={(e) => handleJsonPaste(e.target.value)}
+            className="font-mono text-xs min-h-[100px]"
+            autoComplete="off"
+          />
+          <p className="text-xs text-muted-foreground">
+            Google Cloud Console → IAM y administración → Cuentas de servicio
+            → Claves → Agregar clave → JSON. Pega aquí el contenido del
+            archivo descargado y los dos campos de abajo se llenan solos.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="gcal-email">Email de la cuenta de servicio</Label>
+          <Input
+            id="gcal-email"
+            value={clientEmail}
+            onChange={(e) => setClientEmail(e.target.value)}
+            placeholder="tu-agente@tu-proyecto.iam.gserviceaccount.com"
+            className="font-mono text-xs"
+          />
+          <p className="text-xs text-muted-foreground">
+            Comparte tu Google Calendar con este email (permiso "Hacer cambios
+            en los eventos") para que el agente pueda leer y crear citas.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="gcal-key">Private Key</Label>
+          <Textarea
+            id="gcal-key"
+            value={privateKey}
+            onChange={(e) => setPrivateKey(e.target.value)}
+            placeholder="-----BEGIN PRIVATE KEY-----..."
+            className="font-mono text-xs min-h-[80px]"
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="gcal-calendar">Calendar ID</Label>
+          <Input
+            id="gcal-calendar"
+            value={calendarId}
+            onChange={(e) => setCalendarId(e.target.value)}
+            placeholder="tu-correo@gmail.com (o 'primary' para tu calendario principal)"
+            className="font-mono text-sm"
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="space-y-2">
+            <Label htmlFor="gcal-tz">Zona horaria</Label>
+            <Input
+              id="gcal-tz"
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+              placeholder="America/Mexico_City"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="gcal-start">Horario desde</Label>
+            <Input
+              id="gcal-start"
+              type="number"
+              min={0}
+              max={23}
+              value={startHour}
+              onChange={(e) => setStartHour(Number(e.target.value))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="gcal-end">Horario hasta</Label>
+            <Input
+              id="gcal-end"
+              type="number"
+              min={0}
+              max={23}
+              value={endHour}
+              onChange={(e) => setEndHour(Number(e.target.value))}
+            />
+          </div>
+        </div>
+        <p className="-mt-2 text-xs text-muted-foreground">
+          El agente solo ofrecerá y agendará citas dentro de este horario
+          laboral.
+        </p>
+
+        <div className="flex items-center gap-2 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleTest}
+            disabled={testing}
+            aria-busy={testing}
+          >
+            {testing && (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
+            )}
+            Probar conexión
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSave}
+            disabled={saving}
+            aria-busy={saving}
+          >
+            {saving && (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden />
+            )}
+            Guardar
+          </Button>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
@@ -844,6 +1098,7 @@ export function IntegrationsTab({ workspaceId, initialIntegrations }: Props) {
   const ycloud = findIntegration(integrations, "ycloud");
   const openrouter = findIntegration(integrations, "openrouter");
   const highlevel = findIntegration(integrations, "highlevel");
+  const googleCalendar = findIntegration(integrations, "google_calendar");
 
   return (
     <div className="space-y-6">
@@ -862,6 +1117,12 @@ export function IntegrationsTab({ workspaceId, initialIntegrations }: Props) {
       <HighLevelSection
         workspaceId={workspaceId}
         initial={highlevel}
+        onSaved={refresh}
+      />
+      <Separator />
+      <GoogleCalendarSection
+        workspaceId={workspaceId}
+        initial={googleCalendar}
         onSaved={refresh}
       />
     </div>

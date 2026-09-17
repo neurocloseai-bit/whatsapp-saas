@@ -3,7 +3,8 @@
 Agentes: leer este archivo antes de crear o modificar cualquier componente UI.
 Última actualización: 2026-06-08
 
-Design system: **Glass + Electric Lime** (glassmorphism estilo Apple/visionOS).
+Design system: **Glass + Neuroclose Violet** (glassmorphism estilo Apple/visionOS,
+paleta de marca Neuroclose AI: violeta `#7C3AED` + rosa `#F472B6`).
 Fuente de verdad visual: `http://localhost:3000/ui` (solo desarrollo).
 
 ---
@@ -24,7 +25,10 @@ Tokens (OKLch via CSS vars, soportan opacidad — `bg-primary/10`):
 `bg-destructive, bg-success, bg-warning, bg-info, bg-border, bg-input`
 `text-foreground, text-muted-foreground, text-primary, text-destructive`
 
-El acento lime (`--primary`) es raro a propósito: úsalo para EL CTA, no para todo.
+El violeta (`--primary`) es el acento principal: úsalo para EL CTA, no para todo.
+El rosa (`--accent`) es el segundo acento de marca (badges, highlights puntuales).
+Para un CTA hero o un headline destacado, usa `.brand-gradient` / `.brand-gradient-text`
+(gradiente violeta→rosa 135deg, igual que la landing de Neuroclose AI) — con moderación.
 
 ## Regla 3 — Fuentes del proyecto
 

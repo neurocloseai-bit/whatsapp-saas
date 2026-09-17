@@ -3,7 +3,10 @@
 @tailwind utilities;
 
 /*
- * Design System — Agente WhatsApp · "Glass + Electric Lime"
+ * Design System — Agente WhatsApp · "Neuroclose Violet"
+ * Paleta extraída de la marca Neuroclose AI (neuroclose-ai-landing.vercel.app):
+ * fondo casi negro con tinte violeta, morado #7C3AED como color principal,
+ * rosa #F472B6 como acento secundario (gradiente de marca 135deg violet→pink).
  * Source of truth: /ui (component showcase). Ver COMPONENT_RULES.md.
  *
  * Tokens almacenados como triplets OKLch crudos -> Tailwind inyecta alpha vía
@@ -17,28 +20,29 @@
 
 @layer base {
   :root {
-    /* Light mode (toggle) — blanco frío neutro, NUNCA crema */
-    --background: 0.99 0.002 247;
-    --foreground: 0.2 0.01 264;
+    /* Light mode (toggle) — blanco frío con tinte violeta, NUNCA crema */
+    --background: 0.99 0.004 296;
+    --foreground: 0.19 0.03 296;
 
     --card: 1 0 0;
-    --card-foreground: 0.2 0.01 264;
+    --card-foreground: 0.19 0.03 296;
 
     --popover: 1 0 0;
-    --popover-foreground: 0.2 0.01 264;
+    --popover-foreground: 0.19 0.03 296;
 
-    /* Electric Lime — acento de marca (raro = explota) */
-    --primary: 0.9 0.21 126;
-    --primary-foreground: 0.24 0.05 128;
+    /* Violeta de marca (Neuroclose AI) — acento principal */
+    --primary: 0.541 0.247 293;
+    --primary-foreground: 0.98 0.005 293;
 
-    --secondary: 0.96 0.003 247;
-    --secondary-foreground: 0.25 0.01 264;
+    --secondary: 0.96 0.01 296;
+    --secondary-foreground: 0.25 0.03 296;
 
-    --muted: 0.96 0.003 247;
-    --muted-foreground: 0.5 0.012 264;
+    --muted: 0.96 0.01 296;
+    --muted-foreground: 0.5 0.02 296;
 
-    --accent: 0.95 0.008 247;
-    --accent-foreground: 0.22 0.01 264;
+    /* Rosa de marca, superficie sutil para hovers/badges en light mode */
+    --accent: 0.94 0.03 349.8;
+    --accent-foreground: 0.3 0.1 349.8;
 
     --destructive: 0.58 0.22 25;
     --destructive-foreground: 0.99 0 0;
@@ -47,12 +51,12 @@
     --warning: 0.78 0.16 80;
     --info: 0.62 0.15 250;
 
-    --border: 0.91 0.004 264;
-    --input: 0.91 0.004 264;
-    --ring: 0.9 0.21 126;
+    --border: 0.9 0.012 296;
+    --input: 0.9 0.012 296;
+    --ring: 0.541 0.247 293;
 
-    --chart-1: 0.9 0.21 126;
-    --chart-2: 0.62 0.15 250;
+    --chart-1: 0.541 0.247 293;
+    --chart-2: 0.725 0.175 349.8;
     --chart-3: 0.78 0.16 80;
     --chart-4: 0.65 0.17 150;
     --chart-5: 0.58 0.22 25;
@@ -66,27 +70,29 @@
   }
 
   .dark {
-    /* Dark mode (default) — deep cool black para que el glass + lime brillen */
-    --background: 0.17 0.006 264;
-    --foreground: 0.97 0.002 247;
+    /* Dark mode (default) — casi negro con tinte violeta (#0C0914 en la landing) */
+    --background: 0.15 0.024 296;
+    --foreground: 0.97 0.006 296;
 
-    --card: 0.21 0.006 264;
-    --card-foreground: 0.97 0.002 247;
+    --card: 0.195 0.028 297;
+    --card-foreground: 0.97 0.006 296;
 
-    --popover: 0.2 0.006 264;
-    --popover-foreground: 0.97 0.002 247;
+    --popover: 0.185 0.027 297;
+    --popover-foreground: 0.97 0.006 296;
 
-    --primary: 0.9 0.21 126;
-    --primary-foreground: 0.22 0.05 128;
+    /* Violeta de marca #7C3AED */
+    --primary: 0.541 0.247 293;
+    --primary-foreground: 0.98 0.005 293;
 
-    --secondary: 0.26 0.006 264;
-    --secondary-foreground: 0.97 0.002 247;
+    --secondary: 0.24 0.03 297;
+    --secondary-foreground: 0.97 0.006 296;
 
-    --muted: 0.26 0.006 264;
-    --muted-foreground: 0.7 0.012 264;
+    --muted: 0.22 0.028 297;
+    --muted-foreground: 0.712 0.018 297;
 
-    --accent: 0.27 0.006 264;
-    --accent-foreground: 0.97 0.002 247;
+    /* Rosa de marca #F472B6 — segundo acento (badges, highlights, gradiente) */
+    --accent: 0.725 0.175 349.8;
+    --accent-foreground: 0.18 0.03 349.8;
 
     --destructive: 0.62 0.21 25;
     --destructive-foreground: 0.98 0 0;
@@ -95,12 +101,12 @@
     --warning: 0.82 0.16 85;
     --info: 0.68 0.14 250;
 
-    --border: 0.28 0.006 264;
-    --input: 0.3 0.006 264;
-    --ring: 0.9 0.21 126;
+    --border: 0.274 0.039 299;
+    --input: 0.3 0.04 299;
+    --ring: 0.541 0.247 293;
 
-    --chart-1: 0.9 0.21 126;
-    --chart-2: 0.68 0.14 250;
+    --chart-1: 0.541 0.247 293;
+    --chart-2: 0.725 0.175 349.8;
     --chart-3: 0.82 0.16 85;
     --chart-4: 0.72 0.17 150;
     --chart-5: 0.62 0.21 25;
@@ -109,6 +115,10 @@
     --glass-bg: 1 0 0;
     --glass-bg-alpha: 0.04;
     --glass-border-alpha: 0.08;
+
+    /* Gradiente de marca crudo (violeta → rosa, 135deg), para .brand-gradient */
+    --brand-gradient-from: 0.541 0.247 293;
+    --brand-gradient-to: 0.725 0.175 349.8;
   }
 }
 
@@ -119,16 +129,16 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    /* Glow ambiental lime muy sutil para que el glass "lea" (estilo Apple) */
+    /* Glow ambiental violeta + rosa, como el fondo de partículas de la landing */
     background-image:
       radial-gradient(
         60rem 40rem at 15% -10%,
-        oklch(0.9 0.21 126 / 0.06),
+        oklch(0.541 0.247 293 / 0.12),
         transparent 60%
       ),
       radial-gradient(
         50rem 40rem at 110% 10%,
-        oklch(0.9 0.21 126 / 0.03),
+        oklch(0.725 0.175 349.8 / 0.07),
         transparent 55%
       );
     background-attachment: fixed;
@@ -154,5 +164,31 @@
     -webkit-backdrop-filter: blur(28px) saturate(150%);
     backdrop-filter: blur(28px) saturate(150%);
     border: 1px solid oklch(var(--glass-bg) / var(--glass-border-alpha));
+  }
+
+  /*
+   * .brand-gradient — gradiente de marca Neuroclose AI (violeta → rosa, 135deg),
+   * igual al CTA de la landing page. Úsalo con moderación: el CTA principal de
+   * una pantalla, o un highlight de texto puntual — no para todo.
+   */
+  .brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      oklch(var(--brand-gradient-from, 0.541 0.247 293)) 0%,
+      oklch(var(--brand-gradient-to, 0.725 0.175 349.8)) 100%
+    );
+    color: oklch(0.98 0.005 293);
+  }
+
+  /* Texto con gradiente de marca (bg-clip-text), para headlines destacados. */
+  .brand-gradient-text {
+    background-image: linear-gradient(
+      135deg,
+      oklch(var(--brand-gradient-from, 0.541 0.247 293)) 0%,
+      oklch(var(--brand-gradient-to, 0.725 0.175 349.8)) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
   }
 }
