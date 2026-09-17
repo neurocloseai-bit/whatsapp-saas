@@ -157,7 +157,7 @@ export async function syncTemplatesFromYCloud(
       const t = raw as YCloudTemplate;
       const name = typeof t.name === "string" ? t.name : "";
       const language = typeof t.language === "string" ? t.language : "es";
-      const category = typeof t.category === "string" ? t.category : "UTILITY";
+      const category = typeof t.category === "string" ? t.category.toLowerCase() : "utility";
       const status = mapYCloudStatus(
         typeof t.status === "string" ? t.status : "PENDING",
       );
